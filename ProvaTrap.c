@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <stdbool.h>
+#include <limits.h>
 
 // Definizione della struttura del nodo
 typedef struct nodo {
@@ -148,6 +150,51 @@ void liberaAlbero(Nodo *nodo) {
     free(nodo);
 }
 
+//Funzione booleana per trovare un nodo da staccare a partire dalla radice
+bool isDaStaccare(Nodo *nodo) {
+    if (nodo == NULL) return false;  // Base case: nodo nullo
+    if (nodo->num_Figli > 1) return true;  // Nodo con più di un figlio
+    if (nodo->num_Figli == 1) return isDaStaccare(nodo->figli[0]);  // Ricorsione per l'unico figlio
+    return false;  // Nodo senza figli
+}
+
+//Funzione che trova quale è il nodo da staccare, che poi sposterò sotto un nodo foglia
+Nodo* trovaNodoDaStaccare(Nodo *nodo){
+    int min = INT_MAX;
+    int indexNodo = 0;
+    Nodo *nodoDaStaccare;
+    if(nodo == NULL) return NULL;
+    if(nodo->num_Figli == 1) return trovaNodoDaStaccare(nodo->figli[0]);
+    //Ciclo che trova qual'è il nodo con peso minore e lo salva in una variabile
+    //che poi verrà restituita(sarà la parte di albero staccata)
+    //salva anche l'indice
+    for(int x = 0; x < nodo->num_Figli; x++){
+        if(nodo->figli[x]->value < min){
+                nodoDaStaccare = nodo->figli[x];
+                indexNodo = x;
+                min = nodo->figli[x]->value;
+        }
+    }
+
+    //rimuove il figlio dall'arrayy di figli e diminuisce il numero di figli
+    for (int i = indexNodo; i < nodo->num_Figli - 1; i++) {
+        nodo->figli[i] = nodo->figli[i + 1];
+    }
+    nodo->figli[nodo->num_Figli - 1] = NULL; // Pulizia
+    nodo->num_Figli--;
+    return nodoDaStaccare;
+}
+
+void sposta(Nodo *nodoDaSpostare, Nodo *nodo){
+    if(nodoDaSpostare == NULL || nodo == NULL) return;
+    if(nodo->num_Figli == 0){
+        nodo->figli[0] = nodoDaSpostare;
+        nodo->num_Figli++;
+        return;
+    }
+    sposta(nodoDaSpostare, nodo->figli[0]);
+}
+
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Uso: %s <nome_file>\n", argv[0]);
@@ -166,6 +213,15 @@ int main(int argc, char *argv[]) {
 
     if (radice != NULL) {
         stampaNodi(radice);
+        int peso = 0;
+        while(isDaStaccare(radice)){
+            Nodo* nodoDaStaccare = trovaNodoDaStaccare(radice);
+            sposta(nodoDaStaccare, radice);
+            peso += nodoDaStaccare->value;
+        }
+        printf("\n\n --- NODI SPOSTA --- \n\n");
+        stampaNodi(radice);
+        printf("\n\nCOSTO TOTALE = %d", peso);
         liberaAlbero(radice);
     }
 
