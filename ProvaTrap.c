@@ -159,29 +159,32 @@ bool isDaStaccare(Nodo *nodo) {
 }
 
 //Funzione che trova quale è il nodo da staccare, che poi sposterò sotto un nodo foglia
-Nodo* trovaNodoDaStaccare(Nodo *nodo){
+Nodo* trovaNodoDaStaccare(Nodo *nodo) {
+    if (nodo == NULL || nodo->num_Figli == 0) return NULL;
+
     int min = INT_MAX;
-    int indexNodo = 0;
-    Nodo *nodoDaStaccare;
-    if(nodo == NULL) return NULL;
-    if(nodo->num_Figli == 1) return trovaNodoDaStaccare(nodo->figli[0]);
-    //Ciclo che trova qual'è il nodo con peso minore e lo salva in una variabile
-    //che poi verrà restituita(sarà la parte di albero staccata)
-    //salva anche l'indice
-    for(int x = 0; x < nodo->num_Figli; x++){
-        if(nodo->figli[x]->value < min){
-                nodoDaStaccare = nodo->figli[x];
-                indexNodo = x;
-                min = nodo->figli[x]->value;
+    int indexNodo = -1; // Inizializza l'indice come non valido
+    Nodo *nodoDaStaccare = NULL;
+
+    // Cerca il figlio con valore minimo
+    for (int i = 0; i < nodo->num_Figli; i++) {
+        if (nodo->figli[i]->value < min) {
+            min = nodo->figli[i]->value;
+            nodoDaStaccare = nodo->figli[i];
+            indexNodo = i;
         }
     }
 
-    //rimuove il figlio dall'arrayy di figli e diminuisce il numero di figli
-    for (int i = indexNodo; i < nodo->num_Figli - 1; i++) {
-        nodo->figli[i] = nodo->figli[i + 1];
+    // Se trovi un nodo da staccare, rimuovilo dai figli
+    if (indexNodo != -1) {
+        // Shift degli altri figli per riempire il "buco"
+        for (int i = indexNodo; i < nodo->num_Figli - 1; i++) {
+            nodo->figli[i] = nodo->figli[i + 1];
+        }
+        nodo->figli[nodo->num_Figli - 1] = NULL; // Pulizia
+        nodo->num_Figli--; // Aggiorna il conteggio dei figli
     }
-    nodo->figli[nodo->num_Figli - 1] = NULL; // Pulizia
-    nodo->num_Figli--;
+
     return nodoDaStaccare;
 }
 
@@ -214,14 +217,19 @@ int main(int argc, char *argv[]) {
     if (radice != NULL) {
         stampaNodi(radice);
         int peso = 0;
-        while(isDaStaccare(radice)){
-            Nodo* nodoDaStaccare = trovaNodoDaStaccare(radice);
-            sposta(nodoDaStaccare, radice);
-            peso += nodoDaStaccare->value;
+        Nodo *nodoPadre = radice;
+
+        while (isDaStaccare(nodoPadre)) {
+            Nodo* nodoDaStaccare = trovaNodoDaStaccare(nodoPadre);
+            if (nodoDaStaccare != NULL) {
+                sposta(nodoDaStaccare, radice);
+                peso += nodoDaStaccare->value;
+            }
         }
-        printf("\n\n --- NODI SPOSTA --- \n\n");
+
+        printf("\n\n --- NODI SPOSTATI --- \n\n");
         stampaNodi(radice);
-        printf("\n\nCOSTO TOTALE = %d", peso);
+        printf("\n\nCOSTO TOTALE = %d\n", peso);
         liberaAlbero(radice);
     }
 
