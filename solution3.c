@@ -1,25 +1,23 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <stdbool.h>
-#include <limits.h>
 #include <time.h>
 
 int calculateCost(int connections[], int values[], int numNodes) {
-    int max = values[0], cost=values[0];
+    int support[numNodes];
+    int max = values[0];
+    support[0] = values[0];
     
     for (int i = 1; i < numNodes; i++)
     {
-        cost += values[i];
+        support[i] = support[i - 1] + values[i];
         if(connections[i] == connections[i-1]){
             if(values[i] > max)
                 max = values[i];
         }else{
-            cost -= max;
+            support[i] -= max;
             max = values[i];
         }
     }
-    return cost-max;
+    return support[numNodes-1] - max;
 }
 
 int main(int argc, char *argv[]) {
@@ -74,7 +72,7 @@ int main(int argc, char *argv[]) {
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     printf("COST: %d\n", cost);
-    printf("Execution Time: %.5f sec\n", time_taken);
+    printf("Execution Time: %.20f sec\n", time_taken);
 
     return 0;
 }
