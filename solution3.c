@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <time.h>
 
+
+//functin that calculate the cost of the operation (with dynamic programming) - done by all 
 int calculateCost(int connections[], int values[], int numNodes) {
-    int support[numNodes];
-    int max = values[0];
+    int support[numNodes], max = values[0];
     support[0] = values[0];
-    
-    for (int i = 1; i < numNodes; i++)
-    {
+    for (int i = 1; i < numNodes; i++){
         support[i] = support[i - 1] + values[i];
         if(connections[i] == connections[i-1]){
             if(values[i] > max)
@@ -21,6 +20,7 @@ int calculateCost(int connections[], int values[], int numNodes) {
 }
 
 int main(int argc, char *argv[]) {
+    //Read from File - Trapani Andrea (same as other version)
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
         return 1;
@@ -60,10 +60,11 @@ int main(int argc, char *argv[]) {
 
     fclose(file);
 
-    // Time measurement
+    // Time measurement - Vavassori Enrico (same as other version)
     clock_t start, end;
     start = clock();
-
+    
+    //Call to function 
     int cost = calculateCost(connections, values, numNodes);
 
     end = clock();

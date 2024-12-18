@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <time.h>
 
+//function that find eventual duplicates between nodes with same father - Vavassori Enrico
 int findDuplicate(int connections[], int numNodes) {
     // Array to track already seen elements
     bool seen[numNodes];  // Use numNodes as the array size
@@ -24,6 +25,7 @@ int findDuplicate(int connections[], int numNodes) {
     return -1;
 }
 
+//function that find the min value in values[] between duplicates - Trapani Andrea
 int findMinOf(int connections[], int values[], int duplicate, int numNodes) {
     int minIndex = -1;
     int minValue = INT_MAX;
@@ -38,6 +40,7 @@ int findMinOf(int connections[], int values[], int duplicate, int numNodes) {
     return minIndex;
 }
 
+//function that  put as a father a node without children - Soldani Marco
 void changeValue(int connections[], int index, int numNodes) {
     // Auxiliary array to track existing values
     bool used[numNodes];
@@ -61,6 +64,7 @@ void changeValue(int connections[], int index, int numNodes) {
     }
 }
 
+//function that calculate the total cost - done by all
 int calculateCost(int connections[], int values[], int numNodes) {
     int cost = 0, duplicate;
     while ((duplicate = findDuplicate(connections, numNodes)) != -1) {
@@ -72,6 +76,7 @@ int calculateCost(int connections[], int values[], int numNodes) {
 }
 
 int main(int argc, char *argv[]) {
+    //read from file - Trapani Andrea (same as other version)
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
         return 1;
@@ -111,7 +116,7 @@ int main(int argc, char *argv[]) {
 
     fclose(file);
 
-    // Time measurement
+    // Time measurement - Vavassori Enrico (same as other version)
     clock_t start, end;
     start = clock();
 
